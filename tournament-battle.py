@@ -8,14 +8,8 @@ import random
 
 parser = argparse.ArgumentParser()
 parser.add_argument('port')
-parser.add_argument('--delay', type=int, default=10)
-parser.add_argument('--fight-time', type=int, default=150)
-parser.add_argument('--use-x-spatk', action='store_true')
-parser.add_argument('--use-dynamax', action='store_true')
+parser.add_argument('--fight_time', type=int, default=150)
 args = parser.parse_args()
-
-# ダイマックスによる遅延を追加
-fight_time = args.fight_time + (20 if args.use_dynamax == True else 0)
 
 dt = datetime.datetime
 
@@ -27,11 +21,6 @@ def send(msg, duration=0):
     ser.write(b'RELEASE\r\n')
 
 ser = serial.Serial(args.port, 9600)
-
-# 遅延を入れる
-print(f'{args.delay}秒の遅延を入れています…（--delayで指定可能）')
-sleep(args.delay)
-send('Button LCLICK', 0.1)
 
 try:
     start_time = time.time()
@@ -83,77 +72,55 @@ try:
             sleep(15)
 
             # 勝負
-            print(f'第{i + 1}試合を開始')
 
             send('Button A', 0.1) # 勝負を　しかけてきた！
             sleep(22)
 
             # スペシャルアップを使う
-            if args.use_x_spatk:
-                print('スペシャルアップを使用します')
+            send('LY MAX', 0.1)
+            sleep(0.1)
 
-                send('LY MAX', 0.1)
-                sleep(0.1)
+            send('LY MAX', 0.1)
+            sleep(0.1)
 
-                send('LY MAX', 0.1)
-                sleep(0.1)
+            send('Button A', 0.1)
+            sleep(1.5)
 
-                send('Button A', 0.1)
-                sleep(1.5)
+            send('LX MAX', 0.1)
+            sleep(0.1)
 
-                send('LX MAX', 0.1)
-                sleep(0.1)
+            send('LX MAX', 0.1)
+            sleep(0.1)
 
-                send('LX MAX', 0.1)
-                sleep(0.1)
+            send('LY MAX', 0.1)
+            sleep(0.1)
 
-                send('LY MAX', 0.1)
-                sleep(0.1)
+            send('LY MAX', 0.1)
+            sleep(0.1)
 
-                send('LY MAX', 0.1)
-                sleep(0.1)
+            send('Button A', 0.1)
+            sleep(0.2)
 
-                send('Button A', 0.1)
-                sleep(0.2)
+            send('Button A', 0.1)
+            sleep(12)
 
-                send('Button A', 0.1)
-                sleep(12)
+            send('LY MIN', 0.1)
+            sleep(0.1)
 
-                send('LY MIN', 0.1)
-                sleep(0.1)
-
-                send('LY MIN', 0.1)
-                sleep(0.5)
-
-            # ダイマックスする
-            if args.use_dynamax:
-                print('ダイマックスします')
-
-                send('Button A', 0.1)
-                sleep(0.5)
-
-                send('LX MIN', 0.1)
-                sleep(0.1)
-
-                send('Button A', 0.1)
-                sleep(0.2)
-
-                # ダイマックスわざ
-                send('Button A', 0.1)
-                sleep(0.1)
+            send('LY MIN', 0.1)
+            sleep(0.1)
 
             fight_start_time = time.time()
 
             while True:
-                if (time.time() - fight_start_time) > fight_time:
+                if (time.time() - fight_start_time) > args.fight_time:
                     break
 
                 send('Button A', 0.1)
                 sleep(0.1)
 
-                # 残り秒数
-                if random.randrange(0, 5) == 0:
-                    time_left = round(fight_time - (time.time() - fight_start_time), 2)
+                if random.randrange(2):
+                    time_left = round(args.fight_time - (time.time() - fight_start_time), 2)
                     print(f'[{dt.now()}] 残り{time_left}秒')
 
             print('勝利')
